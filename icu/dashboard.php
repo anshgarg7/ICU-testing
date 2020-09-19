@@ -13,7 +13,6 @@ $patients = getThis("SELECT `id`, `patientID`, `bedID`, `entryTime` from `ipdlog
 <div class="app-main__outer">
     <div class="app-main__inner">
 
-        <button onclick="window.location.href='../speechtotext/stt.py'" class="btn btn-block btn-primary"> Record Voice</button>
         <div class="app-page-title">
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
@@ -33,7 +32,8 @@ $patients = getThis("SELECT `id`, `patientID`, `bedID`, `entryTime` from `ipdlog
         <?php
         } else {
         ?>
-
+        <a href="../speechtotext/stt.py" class="btn btn-block btn-primary">Record Voice</a>
+        <br><br>
             <div class="col-md-12">
                 <div class="main-card mb-3 card" style="overflow-x:scroll;">
                     <div class="card-body">
