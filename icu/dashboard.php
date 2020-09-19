@@ -9,8 +9,11 @@ $patients = getThis("SELECT `id`, `patientID`, `bedID`, `entryTime` from `ipdlog
 
 
 <!-- form area starts -->
+
 <div class="app-main__outer">
     <div class="app-main__inner">
+
+        <button onclick="window.location.href='../speechtotext/stt.py'" class="btn btn-block btn-primary"> Record Voice</button>
         <div class="app-page-title">
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
