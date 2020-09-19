@@ -1,0 +1,195 @@
+#############################################################################
+### Health Card                                                           ###
+###                                                                       ###
+###    _______________________________________________________________    ###
+###   | ID  | Date of Starting  | Full Name        | Roll             |   ###
+###   |=====|===================|==================|==================|   ###
+###   |  1  | April 24, 2020    | Ansh Garg        | Developer        |   ###
+###   |  2  | April 24, 2020    | Tarun Dixit      | Developer        |   ###
+###   |_____|___________________|__________________|__________________|   ###
+###                                                                       ###
+#############################################################################
+###                                                                       ###
+###   Please follow the following method for logging the db changes       ###
+###     ### Date -> (Developer ID)                                        ###
+###       ### Comments for performed changes (if any)                     ###
+###                                                                       ###
+#############################################################################
+#############################################################################
+
+### June 16,2020 -> (2)
+ALTER TABLE `beds` DROP `patientId`;
+CREATE TABLE `ipdrounds` ( `id` INT NOT NULL AUTO_INCREMENT , `doctorID` INT NOT NULL , `hospitalID` INT NOT NULL , `roomID` INT NOT NULL , `roundDate` TIMESTAMP NULL DEFAULT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+### June 16,2020 -> (2)
+ALTER TABLE `doctorleaves` ADD `hospitalID` INT NOT NULL AFTER `doctorID`;
+
+### June 15,2020 -> (2)
+CREATE TABLE `doctorleaves` ( `id` INT NOT NULL AUTO_INCREMENT , `doctorID` INT NOT NULL , `leaveFrom` TIMESTAMP NULL DEFAULT NULL , `leaveTo` TIMESTAMP NULL DEFAULT NULL , `generatedAt` INT NOT NULL DEFAULT CURRENT_TIMESTAMP , `enabled` INT NOT NULL DEFAULT '-1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `doctorleaves` CHANGE `generatedAt` `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+### June 15,2020 -> (2)
+ALTER TABLE `labreports` ADD `reportReview` TEXT NULL DEFAULT NULL AFTER `reportLink`;
+
+### June 15,2020 -> (2)
+ALTER TABLE `labreports` ADD `reportUploaded` INT(1) NOT NULL DEFAULT '0' AFTER `sampleTakenAt`;
+
+### June 14,2020 -> (2)
+ALTER TABLE `laboratories` ADD `hospitalId` INT NOT NULL DEFAULT '0' AFTER `id`;
+ALTER TABLE `labreports` ADD `sampleName` TEXT NOT NULL AFTER `patientID`, ADD `sampleType` TEXT NOT NULL AFTER `sampleName`, ADD `sampleRemarks` TEXT NOT NULL AFTER `sampleType`, ADD `sampleTakenAt` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP AFTER `sampleRemarks`;
+
+### June 12,2020 -> (2)
+ALTER TABLE `doctors` ADD `currentActivity` INT(1) NOT NULL DEFAULT '0' AFTER `lastLogin`;
+CREATE TABLE `doctoractivity` ( `id` INT NOT NULL AUTO_INCREMENT , `doctorId` INT NOT NULL , `currentActivity` INT(1) NOT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `doctoractivity` ADD `hospitalId` INT NOT NULL AFTER `doctorId`;
+
+### June 7,2020 -> (2)
+CREATE TABLE `otbooking` ( `id` INT NOT NULL AUTO_INCREMENT , `otId` INT NOT NULL , `doctorId` INT NOT NULL , `patientId` INT NOT NULL , `startingTime` TIMESTAMP NULL DEFAULT NULL , `endingTime` TIMESTAMP NULL DEFAULT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `enabled` INT NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+### June 7,2020 -> (2)
+CREATE TABLE `operationtheatre` ( `id` INT NOT NULL AUTO_INCREMENT , `hospitalId` INT NOT NULL , `otName` TEXT NOT NULL , `otLocation` TEXT NOT NULL , `otDescription` TEXT NOT NULL , `otOpeningTime` TEXT NOT NULL , `otClosingTime` TEXT NOT NULL , `maintenanceTime` TEXT NOT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `ipdappointment` ADD `procedureToFollow` TEXT NOT NULL AFTER `remarks`, ADD `reason` TEXT NOT NULL AFTER `procedureToFollow`;
+
+### June 5,2020 -> (2)
+ALTER TABLE `patients` ADD `ipdToken` TEXT NOT NULL AFTER `previousMedication`;
+ALTER TABLE `patients` CHANGE `ipdToken` `ipdToken` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+ALTER TABLE `ipdappointment` ADD `ipdToken` TEXT NULL DEFAULT NULL AFTER `generatedAt`;
+
+### June 4,2020 -> (2)
+CREATE TABLE `ipdappointment` ( `id` INT NOT NULL AUTO_INCREMENT , `patientId` INT NOT NULL , `doctorId` INT NOT NULL , `hospitalId` INT NOT NULL , `generatedAt` TIMESTAMP NULL DEFAULT NULL , `admissionDate` TIMESTAMP NULL DEFAULT NULL , `enabled` INT(1) NOT NULL DEFAULT '0' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `ipdappointment` CHANGE `generatedAt` `remarks` TEXT NULL DEFAULT NULL;
+ALTER TABLE `ipdappointment` ADD `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `admissionDate`;
+
+### June 4,2020 -> (2)
+ALTER TABLE `beds` CHANGE `number` `bedNumber` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+ALTER TABLE `beds` CHANGE `usability` `bedUsability` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+ALTER TABLE `beds` CHANGE `equipments` `equipmentAvailable` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+ALTER TABLE `rooms` CHANGE `name` `roomName` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+ALTER TABLE `rooms` CHANGE `description` `roomDescription` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+ALTER TABLE `rooms` CHANGE `location` `roomLocation` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL;
+ALTER TABLE `rooms` CHANGE `beds` `totalBeds` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+ALTER TABLE ipd_log RENAME TO ipdlog;
+
+### June 2,2020 -> (2)
+ALTER TABLE `beds` ADD `enabled` INT(1) NOT NULL DEFAULT '0' AFTER `old_patients`;
+CREATE TABLE `ipd_log` ( `id` INT NOT NULL AUTO_INCREMENT , `patientId` INT NOT NULL , `doctorId` INT NOT NULL , `hospitalId` INT NOT NULL , `prescriptionId` INT NOT NULL , `entryTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `exitTime` TIMESTAMP NULL DEFAULT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `beds` ADD `curr_ipdId` INT NOT NULL AFTER `equipments`;
+ALTER TABLE `beds` DROP `curr_ipdId`, DROP `old_patients`;
+ALTER TABLE `beds` ADD `currIpdId` INT NOT NULL AFTER `equipments`;
+ALTER TABLE `ipd_log` CHANGE `prescriptionId` `bedId` INT NOT NULL;
+
+### June 1,2020 -> (2)
+ALTER TABLE `beds`
+  DROP `patientId`,
+  DROP `hospitalId`;
+ALTER TABLE `beds` ADD `patientId` INT NOT NULL AFTER `id`, ADD `hospitalId` INT NOT NULL AFTER `patientId`;
+ALTER TABLE `rooms` DROP `hospitalId`;
+ALTER TABLE `rooms` ADD `hospitalId` INT NOT NULL AFTER `id`;
+ALTER TABLE `beds` DROP `roomId`;
+ALTER TABLE `beds` ADD `roomId` INT NOT NULL AFTER `hospitalId`;
+
+### June 1,2020 -> (2)
+ALTER TABLE `rooms` ADD `location` TEXT NOT NULL AFTER `description`;
+ALTER TABLE `rooms` CHANGE `beds` `beds` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+ALTER TABLE `rooms` CHANGE `hospital_Id` `hospitalId` INT(11) NOT NULL;
+CREATE TABLE `beds` ( `id` INT NOT NULL AUTO_INCREMENT , `number` TEXT NOT NULL , `usability` TEXT NOT NULL , `equipments` TEXT NOT NULL , `patientId` TEXT NOT NULL , `old_patients` TEXT NOT NULL , `hospitalId` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `beds` ADD `roomId` TEXT NOT NULL AFTER `number`;
+
+### May 31,2020 -> (2)
+CREATE TABLE `rooms` ( `id` INT NOT NULL AUTO_INCREMENT , `name` TEXT NOT NULL , `description` TEXT NOT NULL , `beds` TEXT NOT NULL , `hospital_Id` INT NOT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+### May 16,2020 -> (2)
+CREATE TABLE `discussion` ( `id` INT NOT NULL AUTO_INCREMENT , `doctorID` INT NULL DEFAULT NULL , `patientID` INT NULL DEFAULT NULL , `question` TEXT NOT NULL , `answer` TEXT NOT NULL , `askedAt` TIMESTAMP NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `discussion` CHANGE `answer` `answer` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL;
+
+### May 15,2020 -> (2)
+ALTER TABLE `prescription` ADD `days` INT NOT NULL AFTER `medicineInstructions`;
+
+### May 15,2020 -> (2)
+ALTER TABLE `pharmacies` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT, add PRIMARY KEY (`id`);
+ALTER TABLE `pharmacies` CHANGE `addressLine1` `addressLine1` TEXT NOT NULL;
+
+### May 14,2020 -> (2)
+ALTER TABLE `doctors` CHANGE `tokenID` `tokenID` INT NULL DEFAULT NULL;
+ALTER TABLE `doctors` ADD `allTokens` TEXT NULL DEFAULT NULL AFTER `tokenID`;
+
+### May 14,2020 -> (1)
+ALTER TABLE `doctorsalary` CHANGE `doctorId` `doctorID` INT(11) NOT NULL;
+ALTER TABLE `doctorsalary` CHANGE `allowance` `allowance` TEXT NOT NULL;
+ALTER TABLE `doctorsalary` CHANGE `basicPay` `basicPay` TEXT NOT NULL;
+ALTER TABLE `doctorsalary` CHANGE `basicPay` `basicPay` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL, CHANGE `allowance` `allowance` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+### May 14, 2020 -> (2)
+ALTER TABLE `doctors` CHANGE `tokenID` `tokenID` TEXT NULL DEFAULT NULL;
+ALTER TABLE `doctors` ADD `consultationFee` INT NOT NULL AFTER `tokenID`;
+CREATE TABLE `doctorsalary` ( `id` INT NOT NULL AUTO_INCREMENT , `doctorId` INT NOT NULL , `basicPay` INT NOT NULL , `allowance` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+### May 13,2020 -> (1)
+ALTER TABLE `doctoken` CHANGE `token` `token` TEXT NULL DEFAULT NULL;
+ALTER TABLE `doctoken` ADD `lastLogoutAt` TIMESTAMP NULL DEFAULT NULL AFTER `lastLoginAt`;
+
+### May 12,2020 -> (2)
+ALTER TABLE `patienttoken` ADD `prescriptionView` TEXT NULL DEFAULT NULL AFTER `appointmentAt`, ADD `laboratoryReportsView` TEXT NULL DEFAULT NULL AFTER `prescriptionView`;
+
+### May 12,2020 -> (1)
+ALTER TABLE `patients` ADD `familyHistory` TEXT NULL DEFAULT NULL AFTER `previousDiseases`, ADD `allergicReactions` TEXT NULL DEFAULT NULL AFTER `familyHistory`, ADD `foodHabits` TEXT NULL DEFAULT NULL AFTER `allergicReactions`, ADD `insuranceDetails` TEXT NULL DEFAULT NULL AFTER `foodHabits`;
+
+### May 12,2020 -> (1)
+ALTER TABLE `prescription` ADD `doctorFindings` TEXT NULL DEFAULT NULL AFTER `specialAdvice`, ADD `doctorDiagnosis` TEXT NULL DEFAULT NULL AFTER `doctorFindings`, ADD `patientVitals` TEXT NULL DEFAULT NULL AFTER `doctorDiagnosis`, ADD `labTestAdvice` TEXT NULL DEFAULT NULL AFTER `patientVitals`;
+
+### May 11,2020 -> (2)
+ALTER TABLE `doctors` ADD `visitingDays` TEXT NOT NULL AFTER `slotEndTime`;
+
+### May 10,2020 -> (2)
+ALTER TABLE `doctors` ADD `slotStartTime` TEXT NULL DEFAULT NULL AFTER `tokenID`, ADD `slotEndTime` TEXT NULL DEFAULT NULL AFTER `slotStartTime`;
+
+### May 9,2020 -> (1)
+ALTER TABLE `labreports` DROP `enabled`;
+ALTER TABLE `labreports` ADD `enabled` INT(1) NOT NULL DEFAULT '1' AFTER `testTime`;
+
+### May 9,2020 -> (1)
+CREATE TABLE `laboratories` ( `id` INT NOT NULL AUTO_INCREMENT , `laboratoryName` TEXT NOT NULL , `phoneNumber` TEXT NOT NULL , `emailAddress` TEXT NOT NULL , `addressLine1` TEXT NOT NULL , `cityID` INT NOT NULL , `stateID` INT NOT NULL , `countryID` INT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL , `lastLogin` TIMESTAMP NULL DEFAULT NULL , `createdAt` TIMESTAMP NULL DEFAULT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+CREATE TABLE `pharmacies` ( `id` INT NOT NULL , `pharmacyName` TEXT NOT NULL , `phoneNumber` TEXT NOT NULL , `emailAddress` TEXT NOT NULL , `addressLine1` INT NOT NULL , `cityID` INT NOT NULL , `stateID` INT NOT NULL , `countryID` INT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL , `lastLogin` TIMESTAMP NULL DEFAULT NULL , `createdAt` TIMESTAMP NULL DEFAULT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' ) ENGINE = InnoDB;
+
+### May 8,2020 -> (1)
+ALTER TABLE `prescription` ADD `medicineDosage` TEXT NULL DEFAULT NULL AFTER `medicinePrescribed`, ADD `medicineInstructions` TEXT NULL DEFAULT NULL AFTER `medicineDosage`;
+
+### May 8,2020 -> (2)
+ALTER TABLE `labreports` CHANGE `testTime` `testTime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+### May 7,2020 -> (2)
+    ### reports table added
+CREATE TABLE `labreports` ( `id` INT NOT NULL AUTO_INCREMENT , `prescriptionID` INT NOT NULL DEFAULT '0' , `labID` INT NOT NULL , `patientID` INT NOT NULL , `testName` TEXT NOT NULL , `reportLink` TEXT NOT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , `testTime` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `labreports` CHANGE `labID` `laboratoryID` INT(11) NOT NULL;
+
+### May 6,2020 -> (1)
+ALTER TABLE `patienttoken` ADD PRIMARY KEY(`id`);
+ALTER TABLE `patienttoken` CHANGE `id` `id` INT(11) NOT NULL AUTO_INCREMENT;
+
+### May 6,2020 -> (2)
+CREATE TABLE `departments` ( `id` INT NOT NULL AUTO_INCREMENT , `departmentName` TEXT NOT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+CREATE TABLE `qualifications` ( `id` INT NOT NULL AUTO_INCREMENT , `qualificationName` TEXT NOT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `hospitals` ADD `phoneNumber` TEXT NOT NULL AFTER `hospitalName`;
+ALTER TABLE `hospitals` ADD `emailAddress` TEXT NOT NULL AFTER `phoneNumber`;
+
+### May 6,2020 -> (1)
+ALTER TABLE `doctors` ADD `lastActivity` TIMESTAMP NULL DEFAULT NULL AFTER `lastLogin`;
+ALTER TABLE `doctoken` ADD `enabled` INT(1) NOT NULL DEFAULT '1' AFTER `lastLoginAt`;
+ALTER TABLE `patienttoken` ADD `appointmentAt` TIMESTAMP NULL DEFAULT NULL AFTER `generatedAt`;
+ALTER TABLE `patienttoken` ADD `enabled` INT(1) NOT NULL DEFAULT '1' AFTER `attendedAt`;
+ALTER TABLE `patients` DROP `tokenID`;
+ALTER TABLE `patients` CHANGE `emailAddress` `emailAddress` TEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+
+### May 5,2020 -> (1)
+### tables created
+CREATE TABLE `doctors` ( `id` INT NOT NULL AUTO_INCREMENT , `hospitalID` INT NOT NULL , `departmentID` INT NOT NULL , `qualificationID` INT NOT NULL , `fullName` TEXT NOT NULL , `phoneNumber` TEXT NOT NULL , `emailAddress` TEXT NOT NULL , `dob` DATE NULL DEFAULT NULL , `addressLine1` TEXT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL , `lastLogin` TIMESTAMP NULL DEFAULT NULL , `createdAt` TIMESTAMP NULL DEFAULT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `doctors` ADD `cityID` INT NOT NULL AFTER `addressLine1`, ADD `stateID` INT NOT NULL AFTER `cityID`, ADD `countryID` INT NOT NULL AFTER `stateID`;
+CREATE TABLE `hospitals` ( `id` INT NOT NULL AUTO_INCREMENT , `hospitalName` TEXT NOT NULL , `addressLine1` TEXT NOT NULL , `cityID` INT NOT NULL , `stateID` INT NOT NULL , `countryID` INT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL , `lastLogin` TIMESTAMP NULL DEFAULT NULL , `createdAt` TIMESTAMP NULL DEFAULT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `doctors` ADD `tokenID` TEXT NULL DEFAULT NULL AFTER `password`;
+CREATE TABLE `token` ( `id` INT NOT NULL AUTO_INCREMENT , `hospitalID` INT NOT NULL , `doctorID` INT NOT NULL , `token` INT NOT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `lastLoginAt` TIMESTAMP NULL DEFAULT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `doctors` CHANGE `tokenID` `tokenID` INT NULL DEFAULT NULL;
+RENAME TABLE `token` TO `doctoken`;
+CREATE TABLE `patients` ( `id` INT NOT NULL AUTO_INCREMENT , `fullName` TEXT NOT NULL , `phoneNumber` TEXT NOT NULL , `emailAddress` TEXT NOT NULL , `addressLine1` TEXT NOT NULL , `cityID` INT NOT NULL , `stateID` INT NOT NULL , `countryID` INT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL , `tokenID` INT NOT NULL , `lastLogin` TIMESTAMP NULL DEFAULT NULL , `createdAt` TIMESTAMP NULL DEFAULT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+ALTER TABLE `patients` ADD `previousMedication` TEXT NULL DEFAULT NULL AFTER `tokenID`, ADD `previousDiseases` TEXT NULL DEFAULT NULL AFTER `previousMedication`;
+CREATE TABLE `patienttoken` ( `id` INT NOT NULL , `hospitalID` INT NOT NULL , `doctorID` INT NOT NULL , `patientID` INT NOT NULL , `token` TEXT NOT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `attendedAt` TIMESTAMP NULL DEFAULT NULL ) ENGINE = InnoDB;
+CREATE TABLE `prescription` ( `id` INT NOT NULL AUTO_INCREMENT , `hospitalID` INT NOT NULL , `doctorID` INT NOT NULL , `patientID` INT NOT NULL , `symptoms` TEXT NULL DEFAULT NULL , `dietAdvice` TEXT NULL DEFAULT NULL , `specialAdvice` TEXT NULL DEFAULT NULL , `medicinePrescribed` TEXT NULL DEFAULT NULL , `generatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `updatedAt` TIMESTAMP NULL DEFAULT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;

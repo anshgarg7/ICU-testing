@@ -1,0 +1,46 @@
+#############################################################################
+### Health Card                                                           ###
+###                                                                       ###
+###    _______________________________________________________________    ###
+###   | ID  | Date of Starting  | Full Name        | Roll             |   ###
+###   |=====|===================|==================|==================|   ###
+###   |  1  | September 13, 2020| Ansh Garg        | Developer        |   ###
+###   |  2  | September 13, 2020| Tarun Dixit      | Developer        |   ###
+###   |  3  | September 13, 2020| Uttaran Sarkar   | Developer        |   ###
+###   |  4  | September 13, 2020| Kulpreet Singh   | Developer        |   ###
+###                                                                       ###
+#############################################################################
+###                                                                       ###
+###   Please follow the following method for logging the db changes       ###
+###     ### Date -> (Developer ID)                                        ###
+###       ### Comments for performed changes (if any)                     ###
+###                                                                       ###
+#############################################################################
+#############################################################################
+
+### September 16,2020 -> (4)
+ALTER TABLE `nurses` ADD `roomID` INT(11) NOT NULL AFTER `departmentID`;
+
+### September 16,2020 -> (2)
+ALTER TABLE `doctors` DROP `tokenID`, DROP `allTokens`, DROP `consultationFee`, DROP `slotStartTime`, DROP `slotEndTime`, DROP `visitingDays`, DROP `currentActivity`, DROP `lastActivity`;
+ALTER TABLE `ipdlog` DROP `doctorId`;
+ALTER TABLE `prescription` ADD `doctorID` INT NOT NULL AFTER `id`;
+CREATE TABLE `nurses` ( `id` INT NOT NULL AUTO_INCREMENT , `hospitalID` INT NOT NULL , `departmentID` INT NOT NULL , `fullName` TEXT NOT NULL , `phoneNumber` TEXT NOT NULL , `emailAddress` TEXT NOT NULL , `dob` DATE NOT NULL , `address` TEXT NOT NULL , `cityID` INT NOT NULL , `stateID` INT NOT NULL , `countryID` INT NOT NULL , `username` TEXT NOT NULL , `password` TEXT NOT NULL , `lastLogin` TIMESTAMP NULL DEFAULT NULL , `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+### September 15,2020 -> (2)
+ALTER TABLE `prescription` DROP `hospitalID`, DROP `doctorID`, DROP `patientID`, DROP `patientVitals`, DROP `days`, DROP `updatedAt`;
+
+### September 15,2020 -> (2)
+ALTER TABLE `patients` DROP `ipdToken`;
+ALTER TABLE `patients` ADD `emergencyPhone` TEXT NOT NULL AFTER `phoneNumber`;
+
+### September 14,2020 -> (1)
+ALTER TABLE `vitals` CHANGE `vitalBP` `vitalBP` TEXT NOT NULL, CHANGE `vitalHeartRate` `vitalHeartRate` TEXT NOT NULL, CHANGE `vitalRecordedAt` `vitalRecordedAt` TEXT NOT NULL;
+
+### September 13,2020 -> (2)
+ALTER TABLE `ipdlog` DROP `audioNoteID`;
+DROP TABLE ` ipdappointment `
+ALTER TABLE `ipdlog` ADD `doctorRemarks` TEXT NULL DEFAULT NULL AFTER `roomID`;
+
+### September 13,2020 -> (1)
+CREATE TABLE `audionotes` ( `id` INT NOT NULL AUTO_INCREMENT , `hospitalID` INT NOT NULL , `doctorID` INT NOT NULL , `patientID` INT NOT NULL , `ipdID` INT NOT NULL , `audioNoteLink` TEXT NOT NULL , `generatedAt` TIMESTAMP NOT NULL , `enabled` INT(1) NOT NULL DEFAULT '1' , PRIMARY KEY (`id`)) ENGINE = InnoDB;

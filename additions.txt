@@ -1,0 +1,16 @@
+hide prescription/lab reports (done)
+
+
+ipd
+medicine duration(no of days)
+procedure
+diet
+multiple doctor(main+visiting)
+visit record(ward)
+
+
+pharmacy
+all medicine availabbility together
+
+
+Different OPD timing for different days
